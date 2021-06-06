@@ -15,6 +15,17 @@ sudoku_camp = [
 ]
 
 
+def text_to_camp(text):
+    local_sudoku = [[0]*9]*9
+    n = [st for st in str(text)]
+    start, end = 0, 9
+    for row in range(9):
+        local_sudoku[row] = [int(x) for x in n[start:end]]
+        start += 9
+        end += 9
+    return local_sudoku
+
+
 def get_possibilities(x, y):
     counter_numbers = Counter(all_possible_numbers)
     row_possibilities = counter_numbers - Counter(sudoku_camp[x])
@@ -23,8 +34,8 @@ def get_possibilities(x, y):
     counter_square = Counter([])
 
     # line too long for comprehension
-    for column in range(maximum_y-2, maximum_y):
-        for row in range(maximum_x-2, maximum_x):
+    for column in range(maximum_y-3, maximum_y):
+        for row in range(maximum_x-3, maximum_x):
             counter_square.update([sudoku_camp[row][column]])
 
     square_possibilities = counter_numbers - counter_square
@@ -33,17 +44,45 @@ def get_possibilities(x, y):
 
 
 def set_number(x, y):
-    if not sudoku_camp[x][y]:
-        possible_numbers = list(get_possibilities(x, y))
-        if len(possible_numbers) < 1:
-            return False
-        sudoku_camp[x][y] = possible_numbers[0]
-        if x+1 < 9:
-            return set_number(x+1, y)
-        elif y+1 < 9:
-            return set_number(x, y+1)
+    if sudoku_camp[x][y]:
+        next_number = get_next_zero()
+        if next_number:
+            return set_number(next_number[0], next_number[1])
         else:
             return True
+    else:
+        possibilities = list(get_possibilities(x, y))
+        if len(possibilities) >= 1:
+            for poss in possibilities:
+                sudoku_camp[x][y] = poss
+                is_possible = False
+                next_number = get_next_zero()
+                if next_number:
+                    is_possible = set_number(next_number[0], next_number[1])
+                else:
+                    return True
+                if is_possible:
+                    return True
+            sudoku_camp[x][y] = 0
+            return False
+
+        else:
+            return False
 
 
-print(list(get_possibilities(0, 1)))
+def get_next_zero():
+    for row in range(9):
+        for column in range(9):
+            if not sudoku_camp[row][column]:
+                return row, column
+    return False
+
+
+def show_camp(camp):
+    for row in camp:
+        print(row)
+
+
+set_number(0, 0)
+show_camp(sudoku_camp)
+show_camp(text_to_camp("800103040030000007000407300306012804000000000705840603008601000200000030060205008"))
