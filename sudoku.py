@@ -21,7 +21,10 @@ class Sudoku:
     solved = False
 
     def __init__(self, sudoku_numbers: str):
-        self.sudoku_numbers = sudoku_numbers
+        if len(sudoku_numbers) < 81:
+            self.sudoku_numbers = "0" + sudoku_numbers
+        else:
+            self.sudoku_numbers = sudoku_numbers
         n = [st for st in str(sudoku_numbers)]
         start, end = 0, 9
         for row in range(9):
@@ -86,13 +89,12 @@ class Sudoku:
 
     def solve(self):
         if self.set_numbers(0, 0):
-            print("Sudoku solved")
             self.solved = True
         else:
             print("Impossible to solve")
 
 
 if __name__ == "__main__":
-    sudoku = Sudoku("070060000000000006041708090003070400100205008002030600030602800900000507000080000")
+    sudoku = Sudoku("0"*81)
     sudoku.solve()
     print(sudoku)
